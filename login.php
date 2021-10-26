@@ -16,6 +16,7 @@ include('./include/koneksi.php');
         foreach($results as $res){
         $_SESSION['username']=$res->username;
         $_SESSION['user_level']=$res->user_level;
+        $_SESSION['id']=$res->id_login;
     }
       echo "<script type='text/javascript'> document.location = 'index.php'; </script>";
     } else{

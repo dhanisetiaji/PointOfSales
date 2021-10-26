@@ -16,7 +16,7 @@
                 </ul>
               </li> -->
               <li><a class="nav-link" href="index.php"><i class="fas fa-fire"></i> <span>Dashboard</span></a></li>
-              <li><a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> <span>Barang</span></a></li>
+              <li><a class="nav-link" href="barang.php"><i class="fas fa-shopping-cart"></i> <span>Barang</span></a></li>
               <li><a class="nav-link" href="kategori.php"><i class="fas fa-sitemap"></i> <span>Kategori</span></a></li>
               <li><a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             </ul>

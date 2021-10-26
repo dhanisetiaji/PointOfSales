@@ -18,10 +18,10 @@ else{
         $msg = "Data Berhasil di hapus!";
       }
     if(isset($_POST['tambah'])){
-        $nama_barang = $_POST['kategori_name'];
+        $nama_kategori = $_POST['kategori_name'];
         $qtambah = "INSERT INTO tbl_kategori(kategori_name) VALUES(:kategori_name)";
         $tambah = $dbh->prepare($qtambah);
-        $tambah -> bindParam(':kategori_name',$nama_barang, PDO::PARAM_STR);
+        $tambah -> bindParam(':kategori_name',$nama_kategori, PDO::PARAM_STR);
         $tambah -> execute();
         $msg = "Data Berhasil di tambah!";
 

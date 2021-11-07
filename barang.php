@@ -135,12 +135,12 @@ else{
                             </thead>
                             <tbody>
                                 <?php 
-                                        // function rupiah($angka){
+                                        function rupiah($angka){
                     
-                                        //     $hasil_rupiah = "Rp " . number_format($angka,2,',','.');
-                                        //     return $hasil_rupiah;
+                                            $hasil_rupiah = "Rp " . number_format($angka,2,',','.');
+                                            return $hasil_rupiah;
                                         
-                                        // }
+                                        }
                                         $sql = "SELECT * from tbl_barang JOIN tbl_kategori ON tbl_barang.barang_kategori_id=tbl_kategori.kategori_id";
                                         $query = $dbh -> prepare($sql);
                                         $query->execute();
@@ -156,9 +156,9 @@ else{
                                     <td><?php echo htmlentities($res->barang_id);?></td>
                                     <td><?php echo htmlentities($res->barang_nama);?></td>
                                     <td><?php echo htmlentities($res->barang_satuan);?></td>
-                                    <td><?php echo htmlentities($res->barang_harpok);?></td>
-                                    <td><?php echo htmlentities($res->barang_harjul);?></td>
-                                    <td><?php echo htmlentities($res->barang_harjul_grosir);?></td>
+                                    <td><?php echo htmlentities(rupiah($res->barang_harpok));?></td>
+                                    <td><?php echo htmlentities(rupiah($res->barang_harjul));?></td>
+                                    <td><?php echo htmlentities(rupiah($res->barang_harjul_grosir));?></td>
                                     <td><?php echo htmlentities($res->barang_stok);?></td>
                                     <td><?php echo htmlentities($res->barang_min_stok);?></td>
                                     <td><?php echo htmlentities($res->kategori_name);?></td>

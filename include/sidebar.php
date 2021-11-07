@@ -16,8 +16,19 @@
                 </ul>
               </li> -->
               <li><a class="nav-link" href="index.php"><i class="fas fa-fire"></i> <span>Dashboard</span></a></li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link has-dropdown"><i class="fas fa-shopping-bag"></i><span>Penjualan</span></a>
+                <ul class="dropdown-menu">
+                  <li><a class="nav-link" href="penjualan_eceran.php">Eceran</a></li>
+                  <li><a class="nav-link" href="penjualan_grosir.php">Grosir</a></li>
+                </ul>
+              </li>
               <li><a class="nav-link" href="barang.php"><i class="fas fa-shopping-cart"></i> <span>Barang</span></a></li>
               <li><a class="nav-link" href="kategori.php"><i class="fas fa-sitemap"></i> <span>Kategori</span></a></li>
+              <li><a class="nav-link" href="suplier.php"><i class="fas fa-truck"></i> <span>Suplier</span></a></li>
+              <li><a class="nav-link" href="pembelian.php"><i class="fas fa-cubes"></i> <span>Pembelian</span></a></li>
+              <li><a class="nav-link" href="laporan.php"><i class="fas fa-file"></i> <span>Laporan</span></a></li>
+              <li><a class="nav-link" href="pengguna.php"><i class="fas fa-users"></i> <span>Pengguna</span></a></li>
               <li><a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             </ul>
         </aside>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 26 Okt 2021 pada 17.29
+-- Waktu pembuatan: 07 Nov 2021 pada 14.38
 -- Versi server: 10.1.32-MariaDB
 -- Versi PHP: 5.6.36
 
@@ -41,7 +41,8 @@ CREATE TABLE `login` (
 --
 
 INSERT INTO `login` (`id_login`, `username`, `password`, `user_level`, `created_at`) VALUES
-(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 1, '2021-10-17 13:54:06');
+(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 1, '2021-10-17 13:54:06'),
+(3, 'kasir', '202cb962ac59075b964b07152d234b70', 3, '2021-11-07 13:36:35');
 
 -- --------------------------------------------------------
 
@@ -92,6 +93,26 @@ INSERT INTO `tbl_kategori` (`kategori_id`, `kategori_name`) VALUES
 (30, 'Example Kategori'),
 (31, 'Example 2');
 
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tbl_suplier`
+--
+
+CREATE TABLE `tbl_suplier` (
+  `suplier_id` int(11) NOT NULL,
+  `suplier_name` varchar(50) NOT NULL,
+  `suplier_alamat` varchar(120) NOT NULL,
+  `suplier_notlp` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `tbl_suplier`
+--
+
+INSERT INTO `tbl_suplier` (`suplier_id`, `suplier_name`, `suplier_alamat`, `suplier_notlp`) VALUES
+(2, 'Ahmad S', 'Yogyakartaa', '081227233');
+
 --
 -- Indexes for dumped tables
 --
@@ -117,6 +138,12 @@ ALTER TABLE `tbl_kategori`
   ADD PRIMARY KEY (`kategori_id`);
 
 --
+-- Indeks untuk tabel `tbl_suplier`
+--
+ALTER TABLE `tbl_suplier`
+  ADD PRIMARY KEY (`suplier_id`);
+
+--
 -- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
@@ -124,13 +151,19 @@ ALTER TABLE `tbl_kategori`
 -- AUTO_INCREMENT untuk tabel `login`
 --
 ALTER TABLE `login`
-  MODIFY `id_login` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_login` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT untuk tabel `tbl_kategori`
 --
 ALTER TABLE `tbl_kategori`
   MODIFY `kategori_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT untuk tabel `tbl_suplier`
+--
+ALTER TABLE `tbl_suplier`
+  MODIFY `suplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

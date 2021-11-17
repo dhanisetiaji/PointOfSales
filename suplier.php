@@ -196,19 +196,6 @@ else{
 <?php include('./include/footer.php');?>
 <?php include('./include/script.php');?>
   <!-- Page Specific JS File -->
-  <script type="text/javascript">
-      function sukses(){
-          iziToast.success({
-            title: 'Success,',
-            icon: 'far fa-check-circle',
-            transitionIn: 'fadeInUp',
-            transitionOut: 'fadeOut',
-            position: 'topRight',
-            message: 'Berhasil Menambahkan Data!',
-        });
-
-      }
-  </script>
 <script src="assets/js/page/modules-toastr.js"></script>
 </body>
 </html>

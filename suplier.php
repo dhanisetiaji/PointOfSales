@@ -8,6 +8,12 @@ if(strlen($_SESSION['username'])==0)
 	{	
 header('location:login.php');
 }
+if($_SESSION['user_level']==3){
+    ?> <script language="JavaScript">alert('Anda tidak memiliki akses');</script>
+    <a href="index.php">Go Back</a>
+        <?php
+        // header('Location:./dashboard.php');
+    }
 else{
     if(isset($_GET['del'])){
         $id=$_GET['del'];
@@ -64,7 +70,7 @@ else{
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                    <?php 
+                        <?php 
                                 if($error){
                             ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="far fa-check-circle"></i> <?php echo htmlentities($error); ?> 

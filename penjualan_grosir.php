@@ -8,7 +8,7 @@ if(strlen($_SESSION['username'])==0)
 	{	
 header('location:login.php');
 }
-if($_SESSION['user_level']!=1){
+if($_SESSION['user_level']==2){
     ?> <script language="JavaScript">alert('Anda tidak memiliki akses');</script>
     <a href="index.php">Go Back</a>
         <?php
@@ -17,7 +17,7 @@ if($_SESSION['user_level']!=1){
 else{
     if(isset($_GET['del'])){
         $id=$_GET['del'];
-        $sql = "delete from tbl_beli_tmp  WHERE barang_id=:id";
+        $sql = "delete from tbl_jual_tmp  WHERE barang_id=:id";
         $query = $dbh->prepare($sql);
         $query -> bindParam(':id',$id, PDO::PARAM_STR);
         $query -> execute();
@@ -25,73 +25,102 @@ else{
       }
     if(isset($_POST['pesan'])){
         $barang_id = $_POST['barang_id'];
+        $diskon = $_POST['diskon'];
         $jumlah = $_POST['jumlah'];
-        $harpok = $_POST['harpok'];
-
-        $queryadd = "INSERT INTO tbl_beli_tmp(barang_id,harpok,jumlah,user_id) VALUES(:barang_id,:harpok,:jumlah,:user_id)";
-        $add = $dbh->prepare($queryadd);
-        $add->bindParam(':barang_id',$barang_id);
-        $add->bindParam(':harpok',$harpok);
-        $add->bindParam(':jumlah',$jumlah);
-        $add->bindParam(':user_id',$_SESSION['id']);
-        $add->execute();
-        $msg = "Produk Berhasil ditambah!";
-
+        $sql ="SELECT * FROM tbl_jual_tmp WHERE barang_id=:barang_id";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':barang_id',$barang_id,PDO::PARAM_STR);
+        $query->execute();
+        $getbarangjumlah = $query->fetch();
+        $jumlah1 = $getbarangjumlah['jumlah'];
+        $jumlahtotal = $jumlah1+$jumlah;
+        $sql1 = "SELECT barang_stok FROM tbl_barang WHERE barang_id=:barang_id";
+        $query1 = $dbh->prepare($sql1);
+        $query1->bindParam(':barang_id',$barang_id,PDO::PARAM_STR);
+        $query1->execute();
+        $getbarangstok = $query1->fetch();
+        $stok = $getbarangstok['barang_stok'];
+        // var_dump($stok);
+        // var_dump($jumlahtotal);
+        // die();
+        if($stok >= $jumlahtotal){
+            if($query->rowCount()==0){
+                $queryadd = "INSERT INTO tbl_jual_tmp(barang_id,diskon,jumlah,user_id) VALUES(:barang_id,:diskon,:jumlah,:user_id)";
+                $add = $dbh->prepare($queryadd);
+                $add->bindParam(':barang_id',$barang_id);
+                $add->bindParam(':diskon',$diskon);
+                $add->bindParam(':jumlah',$jumlah);
+                $add->bindParam(':user_id',$_SESSION['id']);
+                $add->execute();
+                $msg = "Produk Berhasil ditambah!";
+            }else{
+                $update=$dbh->prepare("UPDATE tbl_jual_tmp SET jumlah=jumlah+:jumlah,diskon=:diskon where barang_id=:barang_id");
+                $update ->bindParam(':barang_id',$barang_id, PDO::PARAM_STR);
+                $update->bindParam(':diskon',$diskon);
+                $update ->bindParam(':jumlah',$jumlah, PDO::PARAM_STR);
+                $update -> execute(); 
+                $msg = "Produk Berhasil ditambah!";
+            }  
+        }else{
+            $error = "Jumlah Melebihi Stok!";
+        }
     }
     if(isset($_POST['simpan'])){
-        $sql = $dbh->prepare("SELECT max(beli_kode) as id FROM tbl_beli");
+        $sql = $dbh->prepare("SELECT max(d_jual_id) as id FROM tbl_detail_jual");
         $sql->execute();
         $hasil = $sql->fetch();    
         $kode = $hasil['id'];
         $noUrut = (int) substr($kode, 3);
         $noUrut++;
-        $char = "BL";
+        $char = "JL";
         $newID = $char . sprintf("%04s", $noUrut);
-        $beli_kode = $newID;
+        $nofak = $newID;
         $user_id = $_SESSION['id'];
-        $suplier_id = $_POST['suplier_id'];
-        $nofak = $_POST['nofak'];
-        $tgl = $_POST['tgl'];
+        $total_bayar = $_POST['total2'];
+        $jml_uang = $_POST['jml_uang'];
+        $kembalian = $_POST['kembalian'];
+        $keterangan = "Grosir";
         
-        $queryadd = "INSERT INTO tbl_beli(beli_nofak,beli_tanggal,beli_suplier_id,beli_user_id,beli_kode) VALUES(:beli_nofak,:beli_tanggal,:beli_suplier_id,:beli_user_id,:beli_kode)";
+        $queryadd = "INSERT INTO tbl_jual(jual_nofak,jual_total,jual_jml_uang,jual_kembalian,jual_user_id,jual_keterangan) VALUES(:jual_nofak,:jual_total,:jual_jml_uang,:jual_kembalian,:jual_user_id,:jual_keterangan)";
         $add = $dbh->prepare($queryadd);
-        $add->bindParam(':beli_nofak',$nofak);
-        $add->bindParam(':beli_tanggal',$tgl);
-        $add->bindParam(':beli_suplier_id',$suplier_id);
-        $add->bindParam(':beli_user_id',$user_id);
-        $add->bindParam(':beli_kode',$beli_kode);
+        $add->bindParam(':jual_nofak',$nofak);
+        $add->bindParam(':jual_total',$total_bayar);
+        $add->bindParam(':jual_jml_uang',$jml_uang);
+        $add->bindParam(':jual_kembalian',$kembalian);
+        $add->bindParam(':jual_user_id',$user_id);
+        $add->bindParam(':jual_keterangan',$keterangan);
         $add->execute();
 
-        $sql1 = 'SELECT * FROM tbl_beli_tmp JOIN tbl_barang WHERE tbl_beli_tmp.barang_id=tbl_barang.barang_id AND tbl_beli_tmp.user_id=:id';
+        $sql1 = 'SELECT * FROM tbl_jual_tmp JOIN tbl_barang WHERE tbl_jual_tmp.barang_id=tbl_barang.barang_id AND tbl_jual_tmp.user_id=:id';
         $query = $dbh -> prepare($sql1);
         $query->bindParam(':id',$user_id);
         $query->execute();
         $results = $query->fetchAll(PDO::FETCH_OBJ);
         foreach($results as $res){
-            $total1=$res->harpok*$res->jumlah;
-            $totalbeli = $res->harpok*$res->jumlah;
-            $update = $dbh->prepare("UPDATE tbl_barang SET barang_stok=barang_stok+:barang_stok,barang_harpok=:harpok WHERE barang_id=:barang_id");
+            $total1=$res->barang_harjul*$res->jumlah-$res->diskon;
+            $update = $dbh->prepare("UPDATE tbl_barang SET barang_stok=barang_stok-:barang_stok WHERE barang_id=:barang_id");
             $update -> bindParam(':barang_id',$res->barang_id, PDO::PARAM_STR);
             $update -> bindParam(':barang_stok',$res->jumlah, PDO::PARAM_STR);
-            $update -> bindParam(':harpok',$res->harpok, PDO::PARAM_STR);
             $update -> execute();
-            $queryd = "INSERT INTO tbl_detail_beli(d_beli_nofak,d_beli_barang_id,d_beli_harga,d_beli_jumlah,d_beli_total,d_beli_kode) VALUES(:d_beli_nofak,:d_beli_barang_id,:d_beli_harga,:d_beli_jumlah,:d_beli_total,:d_beli_kode)";
+            $queryd = "INSERT INTO tbl_detail_jual(d_jual_nofak,d_jual_barang_id,d_jual_barang_nama,d_jual_barang_satuan,d_jual_barang_harpok,d_jual_barang_harjul,d_jual_qty,d_jual_diskon,d_jual_total) VALUES(:d_jual_nofak,:d_jual_barang_id,:d_jual_barang_nama,:d_jual_barang_satuan,:d_jual_barang_harpok,:d_jual_barang_harjul,:d_jual_qty,:d_jual_diskon,:d_jual_total)";
             $add1 = $dbh->prepare($queryd);
-            $add1->bindParam(':d_beli_nofak',$nofak);
-            $add1->bindParam(':d_beli_barang_id',$res->barang_id);
-            $add1->bindParam(':d_beli_harga',$res->harpok);
-            $add1->bindParam(':d_beli_jumlah',$res->jumlah);
-            $add1->bindParam(':d_beli_total',$total1);
-            $add1->bindParam(':d_beli_kode',$beli_kode);
+            $add1->bindParam(':d_jual_nofak',$nofak);
+            $add1->bindParam(':d_jual_barang_id',$res->barang_id, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_barang_nama',$res->barang_nama, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_barang_satuan',$res->barang_satuan, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_barang_harpok',$res->barang_harpok, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_barang_harjul',$res->barang_harjul, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_qty',$res->jumlah, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_diskon',$res->diskon, PDO::PARAM_STR);
+            $add1->bindParam(':d_jual_total',$total1);
             $add1->execute();
         }
 
-        $sql2 = "delete from tbl_beli_tmp  WHERE user_id=:id";
+        $sql2 = "delete from tbl_jual_tmp  WHERE user_id=:id";
         $query2 = $dbh->prepare($sql2);
         $query2->bindParam(':id',$user_id);
         $query2 -> execute();
-        $msg = "Transaksi Sukses Disimpan.";
-
+        $msg = "Transaksi Sukses Disimpan!";
     }
 ?>
 <?php include('./include/head.php');?>
@@ -102,7 +131,7 @@ else{
 <div class="main-content">
   <section class="section">
     <div class="section-header">
-      <h1>Pembelian</h1>
+      <h1>Penjualan Grosir</h1>
       <div class="section-header-breadcrumb">
           </div>
         </div>
@@ -132,12 +161,12 @@ else{
                                 <table id="example3" class="table table-bordered table-hover">
                             <thead>
                             <tr>
-                                <th>Kode Barang</th>
+                                <th>ID</th>
                                 <th>Nama</th>
                                 <th>Satuan</th>
-                                <th>H Pokok</th>
-                                <th>H Jual</th>
-                                <th>Jumlah Beli</th>
+                                <th>Qty</th>
+                                <th>Diskon</th>
+                                <th>Harga</th>
                                 <th>Sub Total</th>
                                 <th>Action</th>
                             </tr>
@@ -151,7 +180,7 @@ else{
                                     
                                     }
                                     $id = $_SESSION['id'];
-                                    $sql = 'SELECT * FROM tbl_beli_tmp JOIN tbl_barang WHERE tbl_beli_tmp.barang_id=tbl_barang.barang_id AND tbl_beli_tmp.user_id=:id';
+                                    $sql = 'SELECT * FROM tbl_jual_tmp JOIN tbl_barang WHERE tbl_jual_tmp.barang_id=tbl_barang.barang_id AND tbl_jual_tmp.user_id=:id';
                                     $query = $dbh -> prepare($sql);
                                     $query->bindParam(':id',$id);
                                     $query->execute();
@@ -161,22 +190,22 @@ else{
                                     // $ket = array();
                                     if($query->rowCount() > 0){
                                         foreach($results as $res){
-                                        $total = $res->jumlah*$res->harpok;
+                                        $total = $res->jumlah*$res->barang_harjul-$res->diskon;
                                         $totalbelanja += $total;
                                         // $ket[] = "$res->nama_produk ($res->qty)";                    
                                 ?>
                             <tr>
                                 
-                                <td><?php echo htmlentities($res->barang_id);?></td>
+                                <td><?php echo htmlentities($nmr);?></td>
                                 <td><?php echo htmlentities($res->barang_nama);?></td>
                                 <td><?php echo htmlentities($res->barang_satuan);?></td>
-                                <td><?php echo htmlentities(rupiah($res->harpok));?></td>
-                                <td><?php echo htmlentities(rupiah($res->barang_harjul));?></td>
                                 <td><?php echo htmlentities($res->jumlah);?></td>
+                                <td><?php echo htmlentities(rupiah($res->diskon));?></td>
+                                <td><?php echo htmlentities(rupiah($res->barang_harjul));?></td>
                                 <td><?php echo htmlentities(rupiah($total));?></td>
                                 <td>
                                     <!-- <a type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#MyModal<?php echo $res->id_pasien;?>"><i class="fas fa-edit"></i></a> -->
-                                    <a href="pembelian.php?del=<?php echo $res->barang_id;?>" onclick="return confirm('Do you want to delete');" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                                    <a href="penjualan_eceran.php?del=<?php echo $res->barang_id;?>" onclick="return confirm('Do you want to delete');" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
                                 </td>
                             </tr>
                             <?php $nmr=$nmr+1; } } ?>
@@ -186,34 +215,20 @@ else{
                                 <table>
                                     <tr>
                                         <td style="width:760px;" rowspan="2"></td>
-                                        <th style="width:100px;">No Faktur</th>
-                                        <th style="text-align:right;width:180px;"><input type="text" id="nofak" name="nofak" class="form-control input-sm" style="text-align:right;margin-bottom:5px;" required></th>
+                                        <th style="width:140px;">Total Belanja(Rp)</th>
+                                        <th style="text-align:right;width:140px;"><input type="text" name="total2" value="<?= $totalbelanja?>" class="form-control input-sm" style="text-align:right;margin-bottom:5px;" readonly></th>
+                                        <input type="hidden" id="total" name="total" value="<?= $totalbelanja?>" class="form-control input-sm" style="text-align:right;margin-bottom:5px;" readonly>
                                         
                                     </tr>
                                     <tr>
-                                        <th>Tanggal</th>
-                                        <th style="text-align:right;"><input type="date" name="tgl" class="form-control" required></th>
+                                        <th>Tunai(Rp)</th>
+                                        <th style="text-align:right;"><input type="text" id="jml_uang" name="jml_uang" class="jml_uang form-control input-sm" style="text-align:right;margin-bottom:5px;" required></th>
+                                        <input type="hidden" id="jml_uang2" name="jml_uang2" class="form-control input-sm" style="text-align:right;margin-bottom:5px;" required>
                                     </tr>
                                     <tr>
                                         <td></td>
-                                        <th>Suplier</th>
-                                        <th style="text-align:right;">
-                                            <div class="form-group">
-                                                <select name="suplier_id" class="selectpicker form-control" data-live-search="true" required>
-                                                <option value="">-- Pilih Suplier --</option>
-                                                <?php 
-                                                    $sql = "select * from tbl_suplier";
-                                                    $query = $dbh -> prepare($sql);
-                                                    $query->execute();
-                                                    $results=$query->fetchAll(PDO::FETCH_OBJ);
-                                                    if($query->rowCount() > 0){
-                                                        foreach($results as $res){
-                                                ?>
-                                                <option value="<?= $res->suplier_id?>"><?= $res->suplier_name?></option>
-                                                <?php }}?>
-                                                </select>
-                                            </div>
-                                        </th>
+                                        <th>Kembalian(Rp)</th>
+                                        <th style="text-align:right;"><input type="text" id="kembalian" name="kembalian" class="form-control input-sm" style="text-align:right;margin-bottom:5px;" readonly></th>
                                     </tr>
                                     <tr>
                                     <td></td>
@@ -230,7 +245,7 @@ else{
           <div class="modal-dialog" >
               <div class="modal-content">
                   <div class="modal-header">
-                  <h4 class="modal-title">Pembelian</h4>
+                  <h4 class="modal-title">Order!</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
@@ -253,14 +268,14 @@ else{
                               </select>
                           </div>
                           <div class="form-group">
-                              <label for="">Harga Pokok</label>
-                              <input type="text" name="harpok" class="form-control" required>
+                              <label for="">Diskon</label>
+                              <input type="text" name="diskon" class="form-control">
                           </div>
                           <div class="form-group">
                               <label for="">Jumlah</label>
                               <!-- <input type="hidden" name="id" class="form-control" value="<?php echo htmlentities($res->id)?>"> -->
                               <input type="number" name="jumlah" class="form-control" required>
-                              <button Type="submit" name="pesan" class="btn btn-primary mt-4">Simpan</button>
+                              <button Type="submit" name="pesan" class="btn btn-primary mt-4">Pesan</button>
                               <!-- <button Type="submit" name="updatestok" class="btn btn-primary mt-4">Update</button> -->
                           </div>
                       </form>
@@ -275,6 +290,22 @@ else{
 </div>
 <?php include('./include/footer.php');?>
 <?php include('./include/script.php');?>
+  <!-- Page Specific JS File -->
+  <script type="text/javascript">
+        $('document').ready(function(){
+            $(".chosen-select").chosen();
+        })
+        $(function(){
+            $('#jml_uang').on("input",function(){
+                var total=$('#total').val();
+                var jumuang=$('#jml_uang').val();
+                var hsl=jumuang.replace(/[^\d]/g,"");
+                $('#jml_uang2').val(hsl);
+                $('#kembalian').val(hsl-total);
+            })
+            
+        });
+    </script>
 <script src="assets/js/page/modules-toastr.js"></script>
 </body>
 </html>

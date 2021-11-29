@@ -8,6 +8,12 @@ if(strlen($_SESSION['username'])==0)
 	{	
 header('location:login.php');
 }
+if($_SESSION['user_level']==3){
+    ?> <script language="JavaScript">alert('Anda tidak memiliki akses');</script>
+    <a href="index.php">Go Back</a>
+        <?php
+        // header('Location:./dashboard.php');
+    }
 else{
     if(isset($_GET['del'])){
         $id=$_GET['del'];

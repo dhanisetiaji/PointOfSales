@@ -15,7 +15,7 @@ else{
         $uploadOk = 1;
         $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
         // cek image/file gambar
-        if(isset($_POST["submit"])) {
+        if(isset($_POST["tambah"])) {
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
         if($check !== false) {
             $msg = "File adalah image - " . $check["mime"] . ".";
@@ -81,7 +81,7 @@ else{
                             </div>
                             <?php }?>
                     <form action="" method="post" enctype="multipart/form-data">
-                        <div class="section-title">Image Browser</div>
+                        <div class="section-title">Profile Picture</div>
                         <input type="hidden" name="id" value="<?= $_SESSION['id'] ?>">
                             <div class="custom-file">
                             <input type="file" name="fileToUpload" class="custom-file-input" id="customFile">
